@@ -70,6 +70,8 @@ pnpm desktop:build  # Windows alpha bundles: MSI + NSIS .exe
 
 The Windows bundles land in `apps/desktop/src-tauri/target/release/bundle/`. They are an alpha: the engine still runs in TypeScript, and signing, auto-update and release CI are not in place yet. The packaged desktop window disables WebView2's default context menu and browser accelerator keys, and adds frontend guards for reload, find, print, zoom and devtools; the Vite dev build keeps normal browser behavior.
 
+Latest Windows alpha: [`v0.0.2-alpha.2`](https://github.com/TheDevfromDevshome/visulith/releases/tag/v0.0.2-alpha.2) with NSIS `.exe` and MSI. Requires the WebView2 runtime.
+
 CLI:
 
 ```powershell
