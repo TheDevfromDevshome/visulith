@@ -13,19 +13,22 @@
     "tools": "node apps/cli/dist/main.js tools",
     "dev:web": "pnpm --filter @visulith/web dev",
     "build:web": "pnpm --filter @visulith/web build",
-    "desktop:dev": "cargo tauri dev --manifest-path apps/desktop/src-tauri/Cargo.toml",
-    "desktop:build": "pnpm --filter @visulith/web build && cargo tauri build --manifest-path apps/desktop/src-tauri/Cargo.toml",
+    "desktop:dev": "tauri dev --manifest-path apps/desktop/src-tauri/Cargo.toml",
+    "desktop:build": "pnpm --filter @visulith/web build && tauri build --manifest-path apps/desktop/src-tauri/Cargo.toml",
     "registry:dev": "node services/registry/dist/main.js",
     "icons": "node scripts/create-placeholder-icons.mjs",
     "verify": "pnpm build && pnpm test && pnpm run:example",
     "verify:all": "pnpm verify && cargo check --manifest-path apps/desktop/src-tauri/Cargo.toml"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.12.6",
     "@types/node": "catalog:dev",
     "tsx": "catalog:dev",
     "typescript": "catalog:dev"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }
