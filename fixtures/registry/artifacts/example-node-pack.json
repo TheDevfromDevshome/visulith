@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1",
+  "id": "example.node-pack",
+  "name": "Example Node Pack",
+  "version": "0.1.0",
+  "hostApi": "^0.1",
+  "categories": ["nodes"],
+  "capabilities": ["visualNodes"],
+  "license": "MIT",
+  "contributions": {
+    "nodes": []
+  }
+}

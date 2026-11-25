@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1",
+  "id": "@visulith/language-typescript",
+  "name": "TypeScript Language Support",
+  "version": "0.0.1",
+  "hostApi": "^0.1",
+  "categories": ["language", "typescript"],
+  "capabilities": [
+    "sourceEditing",
+    "syntaxHighlighting",
+    "completion",
+    "diagnostics",
+    "formatting",
+    "navigation",
+    "refactoring",
+    "projectDetection",
+    "build",
+    "run",
+    "irExport",
+    "visualNodes"
+  ],
+  "license": "MIT",
+  "description": "Declarative TypeScript language support with honest capability statuses.",
+  "publisher": "Visulith",
+  "permissions": [
+    {
+      "kind": "workspace",
+      "reason": "Read TypeScript sources and write generated output only when the user explicitly asks.",
+      "scope": "src/**"
+    }
+  ],
+  "contributions": {
+    "languages": [
+      {
+        "languageId": "typescript",
+        "displayName": "TypeScript",
+        "extensions": [".ts", ".tsx", ".mts", ".cts"],
+        "mimeTypes": ["text/typescript", "application/typescript"],
+        "capabilities": {
+          "sourceEditing": "Available",
+          "syntaxHighlighting": "Available",
+          "completion": "Available",
+          "diagnostics": "Available",
+          "formatting": "Available",
+          "navigation": "Available",
+          "refactoring": "Partial",
+          "projectDetection": "Partial",
+          "dependencyManagement": "RequiresExternalTool",
+          "build": "Available",
+          "run": "Available",
+          "debug": "Unavailable",
+          "irImport": "Unavailable",
+          "irExport": "Experimental",
+          "visualNodes": "Experimental"
+        }
+      }
+    ],
+    "tools": [
+      {
+        "id": "node",
+        "displayName": "Node.js",
+        "kind": "external",
+        "description": "Runtime used by the run capability; detected via node --version.",
+        "invocationHint": "node --version"
+      },
+      {
+        "id": "tsc",
+        "displayName": "TypeScript compiler",
+        "kind": "external",
+        "description": "Compiler used for builds; detected via tsc --version.",
+        "invocationHint": "tsc --version"
+      },
+      {
+        "id": "npm",
+        "displayName": "npm",
+        "kind": "external",
+        "description": "External package manager hint; this plugin does not modify dependencies.",
+        "invocationHint": "npm --version"
+      }
+    ]
+  },
+  "compatibility": {
+    "node": ">=18",
+    "notes": "Declarative manifest only. Toolchain hints are detection suggestions, not automatic invocations."
+  }
+}

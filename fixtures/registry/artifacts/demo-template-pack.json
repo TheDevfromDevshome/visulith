@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "1",
+  "id": "demo.template-pack",
+  "name": "Demo Template Pack",
+  "version": "0.1.0",
+  "templates": ["typescript-console", "blank"]
+}

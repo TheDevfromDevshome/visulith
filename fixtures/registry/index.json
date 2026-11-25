@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "0.1",
+  "packages": [
+    {
+      "id": "example.node-pack",
+      "version": "0.1.0",
+      "name": "Example Node Pack",
+      "description": "Declarative fixture node pack.",
+      "categories": ["nodes", "examples"],
+      "artifact": "artifacts/example-node-pack.json",
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "aac8055fbe395cd5b25e38b6d0cda32bd38c771058febc6013082c87f7d0041c"
+      },
+      "publisher": { "id": "visulith-fixtures", "name": "Visulith Fixtures" },
+      "license": "MIT",
+      "compatibility": { "hostApi": "^0.1", "node": ">=18" },
+      "permissions": [{ "kind": "workspace", "reason": "Read graph documents." }],
+      "provenance": { "repository": "local-fixture", "signed": false }
+    },
+    {
+      "id": "demo.template-pack",
+      "version": "0.1.0",
+      "name": "Demo Template Pack",
+      "description": "Declarative fixture template pack.",
+      "categories": ["templates", "examples"],
+      "artifact": "artifacts/demo-template-pack.json",
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "868210b1a14671a9154cd72bc054524fd84f5854a9fadea50c9e86a1ae6de22e"
+      },
+      "publisher": { "id": "visulith-fixtures", "name": "Visulith Fixtures" },
+      "license": "MIT",
+      "compatibility": { "hostApi": "^0.1" },
+      "permissions": [],
+      "provenance": { "repository": "local-fixture", "signed": false }
+    }
+  ]
+}
