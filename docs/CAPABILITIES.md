@@ -24,6 +24,10 @@ Capabilities are declared per plugin and per backend. A true flag never means "c
 | Registry | Local metadata, checksum verification, HTTP publish/search | Experimental |
 | Registry service | Local HTTP list/search/publish with checksum gate | Experimental |
 | Debugging | No DAP adapter yet | Unavailable |
+| Desktop shell | Tauri 2 window with scoped file/process IPC | Experimental |
+| Windows bundles | MSI and NSIS `.exe` produced by `pnpm desktop:build`; WebView2 runtime required | Alpha |
+| Release pipeline | Code signing, updater, cross-platform release CI | Unavailable |
+| Rust core engine | Engine still runs in TypeScript; Rust is only the Tauri shell | Not claimed |
 | Collaboration/cloud | Not implemented | Out of scope |
 
 Unsupported constructs produce structured diagnostics; they are never silently omitted.

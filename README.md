@@ -65,7 +65,10 @@ Work on the UI or desktop shell:
 ```powershell
 pnpm dev:web        # Vite dev server
 pnpm desktop:dev    # Tauri window (requires WebView2 on Windows)
+pnpm desktop:build  # Windows alpha bundles: MSI + NSIS .exe
 ```
+
+The Windows bundles land in `apps/desktop/src-tauri/target/release/bundle/`. They are an alpha: the engine still runs in TypeScript, and signing, auto-update and release CI are not in place yet.
 
 CLI:
 
