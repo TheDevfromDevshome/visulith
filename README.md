@@ -39,6 +39,8 @@ packages/language-typescript/ Declarative language plugin
 apps/cli/                   check / generate / run / build / project / tools
 apps/web/                   React workspace UI
 apps/desktop/               Tauri 2 shell with scoped IPC
+services/registry/          Local HTTP registry service
+fixtures/                   Example graphs, projects, plugins and registry data
 out/                        Generated output (derived, gitignored)
 ```
 
@@ -85,6 +87,7 @@ Useful commands:
 pnpm check          # validate the example graph
 pnpm generate       # write generated TypeScript plus a source map
 pnpm run:example    # generate, compile and run the example
+pnpm registry:dev   # start the local package registry service
 ```
 
 The example graph lives in `fixtures/graph-example.json`. Generated output is derived from the graph and is not committed.

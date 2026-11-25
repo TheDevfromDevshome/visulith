@@ -12,6 +12,7 @@ Status reflects implemented code, not ambitions. See [CAPABILITIES.md](CAPABILIT
 - [x] Versioned project manifest, atomic saves and backup before overwrite.
 - [x] Typed commands, workspace state and settings.
 - [x] Declarative plugin API, host, templates, AI service, registry client and npm adapter packages.
+- [x] Checksum-gated local registry HTTP service and declarative TypeScript language metadata.
 - [x] React workspace UI with graph editor, inspector, diagnostics, code viewer and panels.
 - [x] Tauri 2 desktop shell with scoped IPC.
 - [x] CI and Apache-2.0 license.

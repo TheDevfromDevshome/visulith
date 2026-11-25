@@ -14,10 +14,13 @@ Capabilities are declared per plugin and per backend. A true flag never means "c
 | JavaScript/Python/C/C++/Rust/Java/C#/Assembly | Declarative plugin metadata only, no graph lowering | Not claimed |
 | HTML/CSS | Templates only | Partial |
 | Plugins | Declarative manifests, capability declarations | Available (no executable plugin code) |
+| Plugin host | Directory loading, enable/disable, engine-compatible node contributions | Available |
+| Templates | Deterministic built-ins, intent ranking, project scaffolding | Available |
 | WASM/worker plugins | Not implemented | Unavailable |
 | npm libraries | Metadata inspection + best-effort nodes + manual adapters | Experimental |
 | AI | Provider interface, local deterministic proposal provider | Experimental, approval-gated |
 | Registry | Local metadata, checksum verification, HTTP publish/search | Experimental |
+| Registry service | Local HTTP list/search/publish with checksum gate | Experimental |
 | Debugging | No DAP adapter yet | Unavailable |
 | Collaboration/cloud | Not implemented | Out of scope |
 
