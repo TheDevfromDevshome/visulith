@@ -1,5 +1,5 @@
 import { error, type Diagnostic } from "../diagnostics.js";
-import { CORE_IF, CORE_NODE_DEFINITIONS, CORE_START, type NodeDefinitionRegistry } from "./nodes.js";
+import { CORE_IF, CORE_NODE_DEFINITIONS, CORE_REPEAT, CORE_START, type NodeDefinitionRegistry } from "./nodes.js";
 import type { GraphConnection, GraphDocument, GraphNode } from "./types.js";
 
 export interface FlowAnalysis {
@@ -13,6 +13,8 @@ export interface FlowAnalysis {
   joinByIf: Map<string, string>;
   /** Join node id to the If node whose branches reconverge there. */
   ifByJoin: Map<string, string>;
+  /** Valid loop back edges keyed by Repeat node id. */
+  loopBackEdges: Map<string, GraphConnection>;
 }
 
 export function executionKey(nodeId: string, portId: string): string {
@@ -37,6 +39,25 @@ function distancesFrom(
     }
   }
   return distances;
+}
+
+function reachableUntil(
+  startId: string | undefined,
+  stopId: string,
+  connectionsBySourceNode: ReadonlyMap<string, GraphConnection[]>,
+): Set<string> {
+  const reachable = new Set<string>();
+  if (startId === undefined) return reachable;
+  const queue = [startId];
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    if (current === stopId || reachable.has(current)) continue;
+    reachable.add(current);
+    for (const connection of connectionsBySourceNode.get(current) ?? []) {
+      queue.push(connection.target.nodeId);
+    }
+  }
+  return reachable;
 }
 
 /**
@@ -104,6 +125,47 @@ export function analyzeFlow(
     incomingByTarget.set(connection.target.nodeId, incoming);
   }
 
+  const incomingByTargetPort = new Map<string, GraphConnection[]>();
+  for (const connection of graph.connections) {
+    if (connection.kind !== "execution") continue;
+    const key = executionKey(connection.target.nodeId, connection.target.portId);
+    const incoming = incomingByTargetPort.get(key) ?? [];
+    incoming.push(connection);
+    incomingByTargetPort.set(key, incoming);
+  }
+
+  const loopBackEdges = new Map<string, GraphConnection>();
+  for (const node of graph.nodes) {
+    if (node.definitionId !== CORE_REPEAT.definitionId) continue;
+    const entry = incomingByTargetPort.get(executionKey(node.id, "exec-in")) ?? [];
+    const back = incomingByTargetPort.get(executionKey(node.id, "exec-back")) ?? [];
+    const body = execByPort.get(executionKey(node.id, "exec-body"));
+    if (entry.length !== 1 || back.length !== 1 || body === undefined) {
+      diagnostics.push(
+        error(
+          "GRAPH_LOOP_PORTS_INVALID",
+          "A Repeat node needs one incoming edge, one body output and one back edge.",
+          { graphId: graph.id, nodeId: node.id },
+          "Connect exec-in, exec-body and exec-back exactly once.",
+        ),
+      );
+      continue;
+    }
+    const bodyNodes = reachableUntil(body.target.nodeId, node.id, connectionsBySourceNode);
+    if (!bodyNodes.has(back[0]!.source.nodeId)) {
+      diagnostics.push(
+        error(
+          "GRAPH_LOOP_BACK_EDGE_INVALID",
+          "The Repeat back edge must come from a node inside its loop body.",
+          { graphId: graph.id, nodeId: node.id, connectionId: back[0]!.id },
+        ),
+      );
+      continue;
+    }
+    loopBackEdges.set(node.id, back[0]!);
+  }
+  const backEdgeIds = new Set([...loopBackEdges.values()].map((connection) => connection.id));
+
   for (const node of graph.nodes) {
     if (node.definitionId !== CORE_IF.definitionId) continue;
     const trueDistances = distancesFrom(
@@ -155,7 +217,7 @@ export function analyzeFlow(
   }
 
   for (const [nodeId, count] of incomingCount) {
-    if (count <= 1 || ifByJoin.has(nodeId) || rejectedJoins.has(nodeId)) continue;
+    if (count <= 1 || ifByJoin.has(nodeId) || rejectedJoins.has(nodeId) || loopBackEdges.has(nodeId)) continue;
     diagnostics.push(
       error(
         "GRAPH_MULTIPLE_EXEC_INPUTS",
@@ -183,6 +245,7 @@ export function analyzeFlow(
     order.push(node);
     visited.add(node.id);
     for (const connection of connectionsBySourceNode.get(node.id) ?? []) {
+      if (backEdgeIds.has(connection.id)) continue; // Validated loop back edges are not execution cycles.
       const target = nodeById.get(connection.target.nodeId);
       if (target !== undefined) visit(target);
     }
@@ -211,7 +274,7 @@ export function analyzeFlow(
     }
   }
 
-  return { start, nodeById, execByPort, order, joinByIf, ifByJoin };
+  return { start, nodeById, execByPort, order, joinByIf, ifByJoin, loopBackEdges };
 }
 
 /** Compatibility helper for callers that only need the ordered node list. */

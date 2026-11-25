@@ -1,6 +1,6 @@
 import { error, hasErrors, type Diagnostic, type ValidationResult } from "../diagnostics.js";
 import { analyzeFlow, executionKey, type FlowAnalysis } from "../graph/flow.js";
-import { CORE_CONSOLE_LOG, CORE_IF, CORE_SET_VARIABLE, CORE_START } from "../graph/nodes.js";
+import { CORE_CONSOLE_LOG, CORE_IF, CORE_REPEAT, CORE_SET_VARIABLE, CORE_START } from "../graph/nodes.js";
 import { validateGraph } from "../graph/validate.js";
 import type { GraphDocument, GraphNode } from "../graph/types.js";
 import {
@@ -26,6 +26,20 @@ function stringProperty(node: GraphNode, key: string, context: LoweringContext):
       graphId: context.graph.id,
       nodeId: node.id,
     }),
+  );
+  return undefined;
+}
+
+function integerProperty(node: GraphNode, key: string, context: LoweringContext): number | undefined {
+  const value = node.properties[key];
+  if (typeof value === "number" && Number.isInteger(value) && value >= 1) return value;
+  context.diagnostics.push(
+    error(
+      "IR_LOOP_COUNT_INVALID",
+      `Property "${key}" must be a positive integer literal in the MVP.`,
+      { graphId: context.graph.id, nodeId: node.id },
+      "Set the Repeat count to a whole number greater than zero.",
+    ),
   );
   return undefined;
 }
@@ -69,6 +83,22 @@ function lowerSequence(startNodeId: string, context: LoweringContext, stopId?: s
         statements.push({ kind: "variable", name, value: { kind: "string", value }, origin });
       }
       currentId = nextNode(node, "exec-out", context);
+      continue;
+    }
+
+    if (node.definitionId === CORE_REPEAT.definitionId) {
+      const count = integerProperty(node, "count", context);
+      const bodyId = nextNode(node, "exec-body", context);
+      const doneId = nextNode(node, "exec-done", context);
+      if (count !== undefined && bodyId !== undefined) {
+        statements.push({
+          kind: "loop",
+          count: { kind: "integer", value: count },
+          body: lowerSequence(bodyId, context, node.id),
+          origin,
+        });
+      }
+      currentId = doneId;
       continue;
     }
 

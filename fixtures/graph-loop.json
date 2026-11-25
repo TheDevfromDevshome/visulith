@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "0.1",
+  "id": "example.loop",
+  "kind": "structured-flow",
+  "name": "Repeat example",
+  "nodes": [
+    {
+      "id": "start-1",
+      "definitionId": "visulith.core.start",
+      "definitionVersion": "0.1",
+      "position": { "x": 80, "y": 160 },
+      "properties": {}
+    },
+    {
+      "id": "repeat-1",
+      "definitionId": "visulith.core.repeat",
+      "definitionVersion": "0.1",
+      "position": { "x": 280, "y": 160 },
+      "properties": { "count": 3 }
+    },
+    {
+      "id": "log-body",
+      "definitionId": "visulith.core.console-log",
+      "definitionVersion": "0.1",
+      "position": { "x": 480, "y": 80 },
+      "properties": { "message": "tick" }
+    },
+    {
+      "id": "log-done",
+      "definitionId": "visulith.core.console-log",
+      "definitionVersion": "0.1",
+      "position": { "x": 480, "y": 260 },
+      "properties": { "message": "done" }
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge-start-repeat",
+      "source": { "nodeId": "start-1", "portId": "exec-out" },
+      "target": { "nodeId": "repeat-1", "portId": "exec-in" },
+      "kind": "execution"
+    },
+    {
+      "id": "edge-repeat-body",
+      "source": { "nodeId": "repeat-1", "portId": "exec-body" },
+      "target": { "nodeId": "log-body", "portId": "exec-in" },
+      "kind": "execution"
+    },
+    {
+      "id": "edge-body-back",
+      "source": { "nodeId": "log-body", "portId": "exec-out" },
+      "target": { "nodeId": "repeat-1", "portId": "exec-back" },
+      "kind": "execution"
+    },
+    {
+      "id": "edge-repeat-done",
+      "source": { "nodeId": "repeat-1", "portId": "exec-done" },
+      "target": { "nodeId": "log-done", "portId": "exec-in" },
+      "kind": "execution"
+    }
+  ]
+}

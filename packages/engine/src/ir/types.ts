@@ -37,6 +37,7 @@ export type IrStatement =
   | IrCallStatement
   | IrVariableDeclaration
   | IrConditional
+  | IrLoop
   | IrReturnStatement;
 
 export interface IrCallStatement {
@@ -58,6 +59,13 @@ export interface IrConditional {
   condition: IrExpression;
   thenBody: IrStatement[];
   elseBody: IrStatement[];
+  origin: SourceOrigin;
+}
+
+export interface IrLoop {
+  kind: "loop";
+  count: IrExpression;
+  body: IrStatement[];
   origin: SourceOrigin;
 }
 

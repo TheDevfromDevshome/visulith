@@ -122,11 +122,48 @@ export const CORE_IF: NodeDefinition = {
   capabilities: ["structured-flow", "ir-export", "branching"],
 };
 
+const execBody: PortDefinition = {
+  id: "exec-body",
+  direction: "output",
+  kind: "execution",
+  type: TYPES.unit,
+  description: "First statement in the loop body.",
+};
+
+const execBack: PortDefinition = {
+  id: "exec-back",
+  direction: "input",
+  kind: "execution",
+  type: TYPES.unit,
+  required: true,
+  description: "Back edge from the last statement in the loop body.",
+};
+
+const execDone: PortDefinition = {
+  id: "exec-done",
+  direction: "output",
+  kind: "execution",
+  type: TYPES.unit,
+  description: "Statement to run after the loop finishes.",
+};
+
+export const CORE_REPEAT: NodeDefinition = {
+  definitionId: "visulith.core.repeat",
+  version: "0.1",
+  displayName: "Repeat",
+  category: "flow",
+  inputs: [execIn, execBack],
+  outputs: [execBody, execDone],
+  properties: [{ key: "count", type: TYPES.i32, required: true }],
+  capabilities: ["structured-flow", "ir-export", "looping"],
+};
+
 export const CORE_NODE_DEFINITIONS: NodeDefinitionRegistry = new Map<string, NodeDefinition>([
   [CORE_START.definitionId, CORE_START],
   [CORE_CONSOLE_LOG.definitionId, CORE_CONSOLE_LOG],
   [CORE_SET_VARIABLE.definitionId, CORE_SET_VARIABLE],
   [CORE_IF.definitionId, CORE_IF],
+  [CORE_REPEAT.definitionId, CORE_REPEAT],
 ]);
 
 export function isPropertyValueOfType(value: unknown, type: TypeRef, enumValues?: readonly string[]): boolean {

@@ -9,6 +9,7 @@ import { runCli } from "../cli.js";
 const examplePath = fileURLToPath(new URL("../../../../fixtures/graph-example.json", import.meta.url));
 const branchingPath = fileURLToPath(new URL("../../../../fixtures/graph-branching.json", import.meta.url));
 const joinPath = fileURLToPath(new URL("../../../../fixtures/graph-join.json", import.meta.url));
+const loopPath = fileURLToPath(new URL("../../../../fixtures/graph-loop.json", import.meta.url));
 
 test("CLI check accepts the example graph", async () => {
   assert.equal((await runCli(["check", examplePath])).exitCode, 0);
@@ -59,6 +60,18 @@ test("CLI generates and runs the reconverging graph", async () => {
     assert.match(source, /console\.log\("joined"\);/);
     assert.equal(source.indexOf('console.log("joined");'), source.lastIndexOf('console.log("joined");'));
     assert.equal((await runCli(["run", joinPath, "--out", directory])).exitCode, 0);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("CLI generates and runs the repeat graph", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "visulith-cli-loop-"));
+  try {
+    const out = join(directory, "loop.ts");
+    assert.equal((await runCli(["generate", loopPath, "--out", out])).exitCode, 0);
+    assert.match(readFileSync(out, "utf8"), /__visulith_loop_0 < 3/);
+    assert.equal((await runCli(["run", loopPath, "--out", directory])).exitCode, 0);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
