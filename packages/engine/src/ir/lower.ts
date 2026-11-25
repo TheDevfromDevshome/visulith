@@ -34,12 +34,13 @@ function nextNode(node: GraphNode, portId: string, context: LoweringContext): st
   return context.analysis.execByPort.get(executionKey(node.id, portId))?.target.nodeId;
 }
 
-function lowerSequence(startNodeId: string, context: LoweringContext): IrStatement[] {
+function lowerSequence(startNodeId: string, context: LoweringContext, stopId?: string): IrStatement[] {
   const statements: IrStatement[] = [];
   const visiting = new Set<string>();
   let currentId: string | undefined = startNodeId;
 
   while (currentId !== undefined) {
+    if (currentId === stopId) break; // A reconverging join is lowered once, after the conditional.
     if (visiting.has(currentId)) break; // Cycles are reported by flow analysis.
     visiting.add(currentId);
     const node = context.analysis.nodeById.get(currentId);
@@ -85,15 +86,18 @@ function lowerSequence(startNodeId: string, context: LoweringContext): IrStateme
         };
         const trueId = nextNode(node, "exec-true", context);
         const falseId = nextNode(node, "exec-false", context);
+        const joinId = context.analysis.joinByIf.get(node.id);
         statements.push({
           kind: "conditional",
           condition,
-          thenBody: trueId !== undefined ? lowerSequence(trueId, context) : [],
-          elseBody: falseId !== undefined ? lowerSequence(falseId, context) : [],
+          thenBody: trueId !== undefined ? lowerSequence(trueId, context, joinId) : [],
+          elseBody: falseId !== undefined ? lowerSequence(falseId, context, joinId) : [],
           origin,
         });
+        currentId = joinId;
+      } else {
+        currentId = undefined;
       }
-      currentId = undefined;
       continue;
     }
 

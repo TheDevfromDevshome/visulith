@@ -8,6 +8,7 @@ import { runCli } from "../cli.js";
 
 const examplePath = fileURLToPath(new URL("../../../../fixtures/graph-example.json", import.meta.url));
 const branchingPath = fileURLToPath(new URL("../../../../fixtures/graph-branching.json", import.meta.url));
+const joinPath = fileURLToPath(new URL("../../../../fixtures/graph-join.json", import.meta.url));
 
 test("CLI check accepts the example graph", async () => {
   assert.equal((await runCli(["check", examplePath])).exitCode, 0);
@@ -44,6 +45,20 @@ test("CLI generates and runs the branching graph", async () => {
     assert.match(source, /const status: string = "yes";/);
     assert.match(source, /if \(status === "yes"\)/);
     assert.equal((await runCli(["run", branchingPath, "--out", directory])).exitCode, 0);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("CLI generates and runs the reconverging graph", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "visulith-cli-join-"));
+  try {
+    const out = join(directory, "join.ts");
+    assert.equal((await runCli(["generate", joinPath, "--out", out])).exitCode, 0);
+    const source = readFileSync(out, "utf8");
+    assert.match(source, /console\.log\("joined"\);/);
+    assert.equal(source.indexOf('console.log("joined");'), source.lastIndexOf('console.log("joined");'));
+    assert.equal((await runCli(["run", joinPath, "--out", directory])).exitCode, 0);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
