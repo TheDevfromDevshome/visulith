@@ -67,6 +67,25 @@ export function Inspector({ graph, nodeId, diagnostics, onChangeProperties, onDe
               </label>
             );
           }
+          if (property.type.name === "core.i32" || property.type.name === "core.f64") {
+            return (
+              <label className="field" key={property.key}>
+                <span>{property.key} <small>({property.type.name})</small></span>
+                <input
+                  type="number"
+                  step={property.type.name === "core.i32" ? 1 : "any"}
+                  value={typeof current === "number" ? current : 0}
+                  onChange={(event) => {
+                    const value = event.target.valueAsNumber;
+                    onChangeProperties(node.id, {
+                      ...node.properties,
+                      [property.key]: Number.isFinite(value) ? value : 0,
+                    });
+                  }}
+                />
+              </label>
+            );
+          }
           if (property.type.name !== "core.string") {
             return (
               <label className="field" key={property.key}>

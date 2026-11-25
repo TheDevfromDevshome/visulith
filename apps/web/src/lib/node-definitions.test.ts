@@ -9,6 +9,7 @@ test("palette exposes every supported core node", () => {
     "visulith.core.console-log",
     "visulith.core.set-variable",
     "visulith.core.if",
+    "visulith.core.repeat",
   ]);
 });
 
@@ -26,6 +27,17 @@ test("data and execution ports are not compatible", () => {
   assert.ok(dataPort);
   assert.ok(execOut);
   assert.equal(arePortsCompatible(execOut, dataPort), false);
+});
+
+test("repeat body and back-edge ports follow execution semantics", () => {
+  const body = getPortDefinition("visulith.core.repeat", "output", "exec-body");
+  const back = getPortDefinition("visulith.core.repeat", "input", "exec-back");
+  const execIn = getPortDefinition("visulith.core.console-log", "input", "exec-in");
+  assert.ok(body);
+  assert.ok(back);
+  assert.ok(execIn);
+  assert.equal(arePortsCompatible(body, execIn), true);
+  assert.equal(arePortsCompatible(body, back), true);
 });
 
 test("unknown definitions and ports resolve to undefined", () => {

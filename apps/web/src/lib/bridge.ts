@@ -7,7 +7,7 @@ import {
   parseGraphDocument,
   validateGraph as validateGraphDocument,
 } from "@visulith/engine";
-import type { Diagnostic, GraphDocument } from "@visulith/engine";
+import type { Diagnostic, GraphDocument, IrExpression, IrStatement } from "@visulith/engine";
 import { addConnection, addNodeToGraph, createEmptyGraph, updateNodeProperties } from "./graph";
 import { describeGraphChange } from "./diff";
 import type {
@@ -135,27 +135,83 @@ function generated(diagnostics: Diagnostic[]): GeneratedCode {
   };
 }
 
-/** Run the small supported execution subset in-process. No compiler and no child process. */
-function previewExecution(graph: GraphDocument): string {
-  const nodesById = new Map(graph.nodes.map((node) => [node.id, node] as const));
-  const executionEdges = graph.connections.filter(
-    (edge) => edge.kind === "execution" && edge.source.portId === "exec-out",
-  );
-  let current = graph.nodes.find((node) => node.definitionId === CORE_START.definitionId) ?? graph.nodes[0];
-  const visited = new Set<string>();
-  const lines: string[] = [];
+interface PreviewState {
+  variables: Map<string, string>;
+  lines: string[];
+  steps: number;
+  limitReached: boolean;
+}
 
-  while (current !== undefined && !visited.has(current.id)) {
-    visited.add(current.id);
-    if (current.definitionId === CORE_CONSOLE_LOG.definitionId) {
-      const message = current.properties["message"];
-      lines.push(typeof message === "string" ? message : String(message ?? ""));
+const PREVIEW_STEP_LIMIT = 10_000;
+
+function previewValue(expression: IrExpression, variables: ReadonlyMap<string, string>): string | number | boolean | undefined {
+  switch (expression.kind) {
+    case "string":
+      return expression.value;
+    case "integer":
+    case "float":
+      return expression.value;
+    case "boolean":
+      return expression.value;
+    case "variable":
+      return variables.get(expression.name);
+    case "binary": {
+      const left = previewValue(expression.left, variables);
+      const right = previewValue(expression.right, variables);
+      if (left === undefined || right === undefined) return undefined;
+      return expression.operator === "===" ? left === right : left !== right;
     }
-    const nextEdge = executionEdges.find((edge) => edge.source.nodeId === current?.id);
-    current = nextEdge === undefined ? undefined : nodesById.get(nextEdge.target.nodeId);
+    default:
+      return undefined;
   }
+}
 
-  return lines.length > 0 ? `${lines.join("\n")}\n` : "";
+/** Interpret the engine IR in-process. No compiler and no child process are started. */
+function previewStatements(statements: readonly IrStatement[], state: PreviewState): void {
+  for (const statement of statements) {
+    state.steps += 1;
+    if (state.steps > PREVIEW_STEP_LIMIT) {
+      state.limitReached = true;
+      return;
+    }
+    if (statement.kind === "call") {
+      if (statement.target === "core.console.log") {
+        const value = previewValue(statement.arguments[0] ?? { kind: "string", value: "" }, state.variables);
+        state.lines.push(String(value ?? ""));
+      }
+      continue;
+    }
+    if (statement.kind === "variable") {
+      const value = previewValue(statement.value, state.variables);
+      if (value !== undefined) state.variables.set(statement.name, String(value));
+      continue;
+    }
+    if (statement.kind === "conditional") {
+      const branch = previewValue(statement.condition, state.variables) === true ? statement.thenBody : statement.elseBody;
+      previewStatements(branch, state);
+      continue;
+    }
+    if (statement.kind === "loop") {
+      const count = previewValue(statement.count, state.variables);
+      if (typeof count === "number" && Number.isInteger(count) && count > 0) {
+        for (let iteration = 0; iteration < count; iteration += 1) {
+          previewStatements(statement.body, state);
+          if (state.limitReached) return;
+        }
+      }
+      continue;
+    }
+    if (statement.kind === "return") return;
+  }
+}
+
+function previewExecution(graph: GraphDocument): { output: string; diagnostics: Diagnostic[] } {
+  const lowered = lowerGraph(graph);
+  if (lowered.value === undefined) return { output: "", diagnostics: lowered.diagnostics };
+  const state: PreviewState = { variables: new Map(), lines: [], steps: 0, limitReached: false };
+  previewStatements(lowered.value.functions[0]?.body ?? [], state);
+  const output = `${state.lines.map((line) => `${line}\n`).join("")}${state.limitReached ? `[preview stopped after ${PREVIEW_STEP_LIMIT} steps]\n` : ""}`;
+  return { output, diagnostics: lowered.diagnostics };
 }
 
 function templates(): TemplateDescriptor[] {
@@ -296,11 +352,13 @@ export class WebBridge implements Bridge {
         note: "Browser preview: validation failed, so no program was executed and no child process was started.",
       };
     }
+    const preview = previewExecution(request.graph);
+    const combined = [...diagnostics, ...preview.diagnostics];
     return {
       mode: "browser-preview",
-      output: previewExecution(request.graph),
-      diagnostics,
-      exitCode: 0,
+      output: preview.output,
+      diagnostics: combined,
+      exitCode: combined.some((entry) => entry.severity === "error") ? 1 : 0,
       note: "Browser preview: the graph was interpreted in the UI; no child process or compiler was started.",
     };
   }

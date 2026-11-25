@@ -1,5 +1,5 @@
 import type { Edge, Node } from "@xyflow/react";
-import { CORE_CONSOLE_LOG, CORE_IF, CORE_SET_VARIABLE } from "@visulith/engine";
+import { CORE_CONSOLE_LOG, CORE_IF, CORE_REPEAT, CORE_SET_VARIABLE } from "@visulith/engine";
 import type { Diagnostic, GraphConnection, GraphDocument, GraphNode, PortKind, Position } from "@visulith/engine";
 
 export interface FlowNodeData extends Record<string, unknown> {
@@ -103,6 +103,7 @@ const DEFAULT_PROPERTIES: Readonly<Record<string, Readonly<Record<string, unknow
   [CORE_CONSOLE_LOG.definitionId]: { message: "New message" },
   [CORE_SET_VARIABLE.definitionId]: { name: "value", value: "" },
   [CORE_IF.definitionId]: { variable: "value", operator: "equals", value: "" },
+  [CORE_REPEAT.definitionId]: { count: 3 },
 };
 
 export function addNodeToGraph(graph: GraphDocument, definitionId: string, position: Position, id?: string): GraphDocument {

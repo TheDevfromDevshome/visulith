@@ -2,6 +2,7 @@ import {
   CORE_CONSOLE_LOG,
   CORE_IF,
   CORE_NODE_DEFINITIONS,
+  CORE_REPEAT,
   CORE_SET_VARIABLE,
   CORE_START,
   typesEqual,
@@ -15,6 +16,7 @@ export const PALETTE_DEFINITIONS: readonly NodeDefinition[] = [
   CORE_CONSOLE_LOG,
   CORE_SET_VARIABLE,
   CORE_IF,
+  CORE_REPEAT,
 ];
 
 export function getNodeDefinition(definitionId: string): NodeDefinition | undefined {

@@ -37,6 +37,11 @@ test("adding an if node seeds a valid default operator", () => {
   assert.deepEqual(graph.nodes[1]?.properties, { variable: "value", operator: "equals", value: "" });
 });
 
+test("adding a repeat node seeds a positive integer count", () => {
+  const graph = addNodeToGraph(createEmptyGraph("test.flow", "Test flow"), "visulith.core.repeat", { x: 10, y: 20 }, "repeat-1");
+  assert.deepEqual(graph.nodes[1]?.properties, { count: 3 });
+});
+
 test("connections and node updates keep the document consistent", () => {
   let graph = addNodeToGraph(createEmptyGraph("test.flow", "Test flow"), "visulith.core.console-log", { x: 0, y: 200 }, "log-1");
   graph = addConnection(
