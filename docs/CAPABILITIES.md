@@ -5,12 +5,12 @@ Capabilities are declared per plugin and per backend. A true flag never means "c
 | Area | Implemented | Status |
 |---|---|---|
 | Graph documents | Parse, validate, persist (schema 0.1) | Available for MVP subset |
-| Graph kinds | `structured-flow`, linear chains, `if`/`else` branches with one shared join per conditional, and `repeat` loops | Partial |
+| Graph kinds | `structured-flow` (chains, joins, repeat loops) and `dataflow` (integer literals, addition, sinks) | Partial |
 | Graph variables | String variables via `visulith.core.set-variable`, equality/inequality conditions | Experimental |
 | Graph loops | `visulith.core.repeat` with a positive integer literal, body, back edge and continuation; other loop forms rejected | Experimental |
 | Graph editing | Add/connect/delete/move nodes in UI | Available (MVP subset) |
-| Browser run preview | Interprets the lowered IR in-process (including joins and loops); labelled as a preview, never a child process | Experimental |
-| IR | Version 0.1, literals, variables, binary equality, calls, conditionals, loops, unit return, provenance | Partial |
+| Browser run preview | Interprets the lowered IR in-process (joins, loops, dataflow arithmetic); labelled as a preview, never a child process | Experimental |
+| IR | Version 0.1, literals, typed variables, equality/inequality/addition, calls, conditionals, loops, unit return, provenance | Partial |
 | TypeScript backend | Deterministic generation, source maps | Available for supported IR |
 | Build/run | tsc API + Node runtime, structured diagnostics | Available for TypeScript |
 | JavaScript/Python/C/C++/Rust/Java/C#/Assembly | Declarative plugin metadata only, no graph lowering | Not claimed |

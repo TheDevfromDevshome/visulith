@@ -90,7 +90,7 @@ pnpm run:example    # generate, compile and run the example
 pnpm registry:dev   # start the local package registry service
 ```
 
-The example graph lives in `fixtures/graph-example.json`. Additional fixtures cover `graph-branching.json`, `graph-join.json` (reconverging branches) and `graph-loop.json` (repeat loop); all can be passed to the same CLI commands. Generated output is derived from the graph and is not committed.
+The example graph lives in `fixtures/graph-example.json`. Additional fixtures cover `graph-branching.json`, `graph-join.json` (reconverging branches), `graph-loop.json` (repeat loop) and `graph-dataflow.json` (integer arithmetic); all can be passed to the same CLI commands. Generated output is derived from the graph and is not committed.
 
 ## Ownership model
 
