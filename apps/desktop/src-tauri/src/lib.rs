@@ -1,9 +1,11 @@
 mod commands;
+mod native_webview;
 
 use tauri::Manager;
 
 pub fn run() {
     tauri::Builder::default()
+        .plugin(native_webview::init())
         .invoke_handler(tauri::generate_handler![
             commands::list_projects,
             commands::read_file,

@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "tsx --test src/lib/graph.test.ts src/lib/node-definitions.test.ts src/lib/bridge.test.ts src/lib/desktop-config.test.ts"
+    "test": "tsx --test src/lib/graph.test.ts src/lib/node-definitions.test.ts src/lib/bridge.test.ts src/lib/desktop-config.test.ts src/lib/desktop-guards.test.ts"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

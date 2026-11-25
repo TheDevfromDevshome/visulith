@@ -1,6 +1,6 @@
 [package]
 name = "visulith-desktop"
-version = "0.0.1"
+version = "0.0.2"
 description = "Visulith desktop shell"
 authors = ["TheDevfromDevshome"]
 edition = "2021"
@@ -17,3 +17,7 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+[target.'cfg(windows)'.dependencies]
+webview2-com = "0.39"
+windows-core = "0.62"

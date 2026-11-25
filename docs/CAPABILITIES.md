@@ -24,7 +24,8 @@ Capabilities are declared per plugin and per backend. A true flag never means "c
 | Registry | Local metadata, checksum verification, HTTP publish/search | Experimental |
 | Registry service | Local HTTP list/search/publish with checksum gate | Experimental |
 | Debugging | No DAP adapter yet | Unavailable |
-| Desktop shell | Tauri 2 window with scoped file/process IPC | Experimental |
+| Desktop shell | Tauri 2 window with scoped file/process IPC; WebView2 default context menu and browser accelerator keys disabled, with frontend guards for reload, find, print, zoom and devtools | Experimental |
+| Desktop UI | Studio-style workspace with collapsible output panel and run action in the window header | Experimental |
 | Windows bundles | MSI and NSIS `.exe` produced by `pnpm desktop:build`; WebView2 runtime required | Alpha |
 | Release pipeline | Code signing, updater, cross-platform release CI | Unavailable |
 | Rust core engine | Engine still runs in TypeScript; Rust is only the Tauri shell | Not claimed |
