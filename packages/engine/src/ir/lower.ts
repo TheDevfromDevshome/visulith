@@ -2,7 +2,8 @@ import { error, hasErrors, type Diagnostic, type ValidationResult } from "../dia
 import { analyzeFlow, executionKey, type FlowAnalysis } from "../graph/flow.js";
 import { CORE_CONSOLE_LOG, CORE_IF, CORE_REPEAT, CORE_SET_VARIABLE, CORE_START } from "../graph/nodes.js";
 import { validateGraph } from "../graph/validate.js";
-import type { GraphDocument, GraphNode } from "../graph/types.js";
+import { DATAFLOW_KIND, type GraphDocument, type GraphNode } from "../graph/types.js";
+import { lowerDataflowGraph } from "./lower-dataflow.js";
 import {
   IR_VERSION,
   unitType,
@@ -145,10 +146,12 @@ function lowerSequence(startNodeId: string, context: LoweringContext, stopId?: s
   return statements;
 }
 
-/** Lower a validated structured-flow graph into the versioned semantic IR. */
+/** Lower a validated graph into the versioned semantic IR. */
 export function lowerGraph(graph: GraphDocument): ValidationResult<IrModule> {
   const diagnostics = validateGraph(graph);
   if (hasErrors(diagnostics)) return { ok: false, diagnostics };
+
+  if (graph.kind === DATAFLOW_KIND) return lowerDataflowGraph(graph);
 
   const analysis = analyzeFlow(graph, diagnostics);
   if (analysis === undefined || hasErrors(diagnostics)) return { ok: false, diagnostics };

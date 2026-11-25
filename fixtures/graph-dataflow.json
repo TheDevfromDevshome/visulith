@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "0.1",
+  "id": "example.dataflow",
+  "kind": "dataflow",
+  "name": "Dataflow example",
+  "nodes": [
+    {
+      "id": "left",
+      "definitionId": "visulith.core.data.int-literal",
+      "definitionVersion": "0.1",
+      "position": { "x": 80, "y": 120 },
+      "properties": { "value": 2 }
+    },
+    {
+      "id": "right",
+      "definitionId": "visulith.core.data.int-literal",
+      "definitionVersion": "0.1",
+      "position": { "x": 80, "y": 240 },
+      "properties": { "value": 3 }
+    },
+    {
+      "id": "sum",
+      "definitionId": "visulith.core.data.add",
+      "definitionVersion": "0.1",
+      "position": { "x": 320, "y": 180 },
+      "properties": {}
+    },
+    {
+      "id": "print",
+      "definitionId": "visulith.core.data.log",
+      "definitionVersion": "0.1",
+      "position": { "x": 560, "y": 180 },
+      "properties": {}
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge-left-sum",
+      "source": { "nodeId": "left", "portId": "value" },
+      "target": { "nodeId": "sum", "portId": "left" },
+      "kind": "data"
+    },
+    {
+      "id": "edge-right-sum",
+      "source": { "nodeId": "right", "portId": "value" },
+      "target": { "nodeId": "sum", "portId": "right" },
+      "kind": "data"
+    },
+    {
+      "id": "edge-sum-print",
+      "source": { "nodeId": "sum", "portId": "result" },
+      "target": { "nodeId": "print", "portId": "value" },
+      "kind": "data"
+    }
+  ]
+}

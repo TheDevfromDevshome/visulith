@@ -3,6 +3,7 @@ import { error, fail, isRecord, ok, type ValidationResult } from "../diagnostics
 /** Version of the graph document schema implemented by this proof of concept. */
 export const GRAPH_SCHEMA_VERSION = "0.1";
 export const STRUCTURED_FLOW_KIND = "structured-flow";
+export const DATAFLOW_KIND = "dataflow";
 
 export type { PrimitiveTypeName, TypeRef } from "../types.js";
 export { TYPES, primitive, typesEqual } from "../types.js";

@@ -50,6 +50,8 @@ export interface IrCallStatement {
 export interface IrVariableDeclaration {
   kind: "variable";
   name: string;
+  /** Explicit type when the lowering knows it; backends infer it from the value otherwise. */
+  type?: TypeRef;
   value: IrExpression;
   origin: SourceOrigin;
 }
@@ -108,7 +110,7 @@ export interface IrVariableReference {
   name: string;
 }
 
-export type IrBinaryOperator = "===" | "!==";
+export type IrBinaryOperator = "===" | "!==" | "+";
 
 export interface IrBinaryExpression {
   kind: "binary";

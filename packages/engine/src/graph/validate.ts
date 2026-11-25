@@ -6,7 +6,10 @@ import {
   isPropertyValueOfType,
   type NodeDefinitionRegistry,
 } from "./nodes.js";
+import { DATAFLOW_NODE_DEFINITIONS } from "./dataflow-nodes.js";
+import { analyzeDataflow } from "./dataflow.js";
 import {
+  DATAFLOW_KIND,
   GRAPH_SCHEMA_VERSION,
   STRUCTURED_FLOW_KIND,
   typesEqual,
@@ -17,34 +20,13 @@ import {
 
 const CONNECTION_KINDS: readonly PortKind[] = ["data", "execution", "event", "reference"];
 
-/** Structural, connection, type and semantic validation for the MVP graph subset. */
-export function validateGraph(
-  graph: GraphDocument,
-  registry: NodeDefinitionRegistry = CORE_NODE_DEFINITIONS,
-): Diagnostic[] {
+function defaultRegistry(kind: string): NodeDefinitionRegistry {
+  return kind === DATAFLOW_KIND ? DATAFLOW_NODE_DEFINITIONS : CORE_NODE_DEFINITIONS;
+}
+
+/** Structural, connection and type checks shared by every graph kind. */
+function validateCommonGraph(graph: GraphDocument, registry: NodeDefinitionRegistry): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
-
-  if (graph.schemaVersion !== GRAPH_SCHEMA_VERSION) {
-    diagnostics.push(
-      error(
-        "GRAPH_SCHEMA_UNSUPPORTED",
-        `Graph schemaVersion "${graph.schemaVersion}" is not supported (expected ${GRAPH_SCHEMA_VERSION}).`,
-        { graphId: graph.id },
-      ),
-    );
-    return diagnostics;
-  }
-  if (graph.kind !== STRUCTURED_FLOW_KIND) {
-    diagnostics.push(
-      error(
-        "GRAPH_KIND_UNSUPPORTED",
-        `Graph kind "${graph.kind}" is not supported in the MVP (expected ${STRUCTURED_FLOW_KIND}).`,
-        { graphId: graph.id },
-      ),
-    );
-    return diagnostics;
-  }
-
   const nodeById = new Map<string, GraphNode>();
   for (const node of graph.nodes) {
     if (nodeById.has(node.id)) {
@@ -186,6 +168,44 @@ export function validateGraph(
         ),
       );
     }
+  }
+
+  return diagnostics;
+}
+
+/** Structural, connection, type and kind-specific semantic validation. */
+export function validateGraph(
+  graph: GraphDocument,
+  registry: NodeDefinitionRegistry = defaultRegistry(graph.kind),
+): Diagnostic[] {
+  const diagnostics: Diagnostic[] = [];
+
+  if (graph.schemaVersion !== GRAPH_SCHEMA_VERSION) {
+    diagnostics.push(
+      error(
+        "GRAPH_SCHEMA_UNSUPPORTED",
+        `Graph schemaVersion "${graph.schemaVersion}" is not supported (expected ${GRAPH_SCHEMA_VERSION}).`,
+        { graphId: graph.id },
+      ),
+    );
+    return diagnostics;
+  }
+  if (graph.kind !== STRUCTURED_FLOW_KIND && graph.kind !== DATAFLOW_KIND) {
+    diagnostics.push(
+      error(
+        "GRAPH_KIND_UNSUPPORTED",
+        `Graph kind "${graph.kind}" is not supported (expected ${STRUCTURED_FLOW_KIND} or ${DATAFLOW_KIND}).`,
+        { graphId: graph.id },
+      ),
+    );
+    return diagnostics;
+  }
+
+  diagnostics.push(...validateCommonGraph(graph, registry));
+
+  if (graph.kind === DATAFLOW_KIND) {
+    analyzeDataflow(graph, diagnostics, registry);
+    return diagnostics;
   }
 
   // Flow validation adds cycle, reachability, start-node and execution-port diagnostics.

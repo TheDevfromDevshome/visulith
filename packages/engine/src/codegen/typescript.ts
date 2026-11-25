@@ -1,6 +1,8 @@
 import { error, hasErrors, type Diagnostic, type SourceRef } from "../diagnostics.js";
+import { TYPES, type TypeRef } from "../types.js";
 import {
   IR_VERSION,
+  type IrBinaryOperator,
   type IrExpression,
   type IrModule,
   type IrStatement,
@@ -26,6 +28,8 @@ function isIdentifier(value: string): boolean {
   return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(value) && !RESERVED.has(value);
 }
 
+const BINARY_OPERATORS: readonly IrBinaryOperator[] = ["===", "!==", "+"];
+
 function renderExpression(expression: IrExpression): string | undefined {
   switch (expression.kind) {
     case "string":
@@ -38,10 +42,44 @@ function renderExpression(expression: IrExpression): string | undefined {
     case "variable":
       return isIdentifier(expression.name) ? expression.name : undefined;
     case "binary": {
+      if (!BINARY_OPERATORS.includes(expression.operator)) return undefined;
       const left = renderExpression(expression.left);
       const right = renderExpression(expression.right);
       return left !== undefined && right !== undefined ? `${left} ${expression.operator} ${right}` : undefined;
     }
+    default:
+      return undefined;
+  }
+}
+
+function inferExpressionType(expression: IrExpression): TypeRef | undefined {
+  switch (expression.kind) {
+    case "string":
+      return TYPES.string;
+    case "integer":
+      return TYPES.i32;
+    case "float":
+      return TYPES.f64;
+    case "boolean":
+      return TYPES.bool;
+    case "variable":
+      return undefined;
+    case "binary":
+      return expression.operator === "+" ? inferExpressionType(expression.left) : TYPES.bool;
+    default:
+      return undefined;
+  }
+}
+
+function typescriptType(type: TypeRef | undefined): string | undefined {
+  switch (type?.name) {
+    case "core.string":
+      return "string";
+    case "core.i32":
+    case "core.f64":
+      return "number";
+    case "core.bool":
+      return "boolean";
     default:
       return undefined;
   }
@@ -134,7 +172,14 @@ export function generateTypeScript(ir: IrModule): CodegenResult {
         diagnostics.push(error("CODEGEN_UNSUPPORTED_EXPRESSION", "An IR expression cannot be generated.", origin));
         return;
       }
-      emit(`${prefix}const ${statement.name}: string = ${value};`, origin, level * 2 + 1);
+      const type = typescriptType(statement.type ?? inferExpressionType(statement.value));
+      if (type === undefined) {
+        diagnostics.push(
+          error("CODEGEN_UNSUPPORTED_VARIABLE_TYPE", "A variable declaration has no supported TypeScript type.", origin),
+        );
+        return;
+      }
+      emit(`${prefix}const ${statement.name}: ${type} = ${value};`, origin, level * 2 + 1);
       return;
     }
 
