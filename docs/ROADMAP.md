@@ -20,7 +20,8 @@ Status reflects implemented code, not ambitions. See [CAPABILITIES.md](CAPABILIT
 ## Next
 
 - [x] Branching/conditional nodes and string variables in the graph subset.
-- [ ] Loops and reconverging branches in the graph subset.
+- [x] Reconverging branches with one shared join per conditional.
+- [x] Repeat loops with a validated back edge and deterministic `for` generation.
 - [ ] Additional graph kinds: dataflow, event, composition.
 - [ ] Language plugins with real IR mappings (JavaScript first).
 - [ ] LSP and DAP adapters.
