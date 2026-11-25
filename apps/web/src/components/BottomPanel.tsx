@@ -1,5 +1,5 @@
 import { useState, type JSX } from "react";
-import { AlertCircle, AlertTriangle, Info, Play } from "lucide-react";
+import { AlertCircle, AlertTriangle, ChevronDown, ChevronUp, Info, Play } from "lucide-react";
 import type { Diagnostic } from "@visulith/engine";
 import type { GeneratedCode, RunResult } from "../lib/types";
 
@@ -29,11 +29,12 @@ export function BottomPanel({
   onSelectNode,
 }: BottomPanelProps): JSX.Element {
   const [view, setView] = useState<"diagnostics" | "output">("diagnostics");
+  const [expanded, setExpanded] = useState(true);
   const errors = diagnostics.filter((entry) => entry.severity === "error").length;
   const warnings = diagnostics.filter((entry) => entry.severity === "warning").length;
 
   return (
-    <section className="bottom-panel" aria-label="Build and run panel">
+    <section className={`bottom-panel${expanded ? "" : " bottom-panel--collapsed"}`} aria-label="Build and run panel">
       <header className="bottom-panel__header">
         <div className="bottom-panel__tabs" role="tablist" aria-label="Build output views">
           <button type="button" role="tab" aria-selected={view === "diagnostics"} className={view === "diagnostics" ? "is-active" : ""} onClick={() => setView("diagnostics")}>
@@ -44,16 +45,26 @@ export function BottomPanel({
           </button>
         </div>
         <div className="bottom-panel__actions">
-          <span className="muted">
+          <span className={`issue-count${errors > 0 ? " issue-count--error" : warnings > 0 ? " issue-count--warning" : ""}`}>
             {errors} error{errors === 1 ? "" : "s"} · {warnings} warning{warnings === 1 ? "" : "s"}
           </span>
-          <button className="button button--primary" type="button" onClick={onRun} disabled={running}>
-            <Play size={14} aria-hidden="true" /> {running ? "Running…" : "Run"}
+          <button
+            className="icon-button"
+            type="button"
+            onClick={() => setExpanded((previous) => !previous)}
+            title={expanded ? "Collapse panel" : "Expand panel"}
+            aria-label={expanded ? "Collapse panel" : "Expand panel"}
+            aria-expanded={expanded}
+          >
+            {expanded ? <ChevronDown size={14} aria-hidden="true" /> : <ChevronUp size={14} aria-hidden="true" />}
+          </button>
+          <button className="button button--primary button--compact" type="button" onClick={onRun} disabled={running}>
+            <Play size={13} aria-hidden="true" /> {running ? "Running…" : "Run"}
           </button>
         </div>
       </header>
 
-      {view === "diagnostics" ? (
+      {expanded && (view === "diagnostics" ? (
         <div className="bottom-panel__body" role="tabpanel">
           {diagnostics.length === 0 ? (
             <p className="panel-empty">No diagnostics. The graph is valid.</p>
@@ -106,7 +117,7 @@ export function BottomPanel({
             </div>
           </div>
         </div>
-      )}
+      ))}
     </section>
   );
 }

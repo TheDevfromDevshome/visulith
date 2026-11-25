@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type JSX } from "react";
+import { Play } from "lucide-react";
 import type { GraphDocument } from "@visulith/engine";
 import { getBridge, isDesktopRuntime } from "./lib/bridge";
 import { createEmptyGraph, removeEntities } from "./lib/graph";
@@ -262,14 +263,25 @@ export default function App(): JSX.Element {
     <div className="app" data-theme={settings.theme} data-contrast={settings.contrast}>
       <header className="app-header">
         <div className="app-header__title">
-          <strong>Visulith Studio</strong>
-          {project !== null && <span className="muted">/ {project.name}</span>}
+          <span className="app-header__mark" aria-hidden="true">◈</span>
+          <strong>Visulith</strong>
+          <span className="app-header__context">{project?.name ?? "No project open"}</span>
         </div>
         <div className="app-header__right">
           <span className={`badge ${desktop ? "badge--desktop" : "badge--browser"}`}>
-            {desktop ? "Tauri desktop" : "Browser build"}
+            {desktop ? "Desktop" : "Browser preview"}
           </span>
-          <span className="status">{status}</span>
+          <span className="status" role="status">{status}</span>
+          <button
+            className="button button--primary button--compact"
+            type="button"
+            onClick={() => void run()}
+            disabled={running || activeGraph === null}
+            title="Run the active graph"
+          >
+            <Play size={13} aria-hidden="true" />
+            {running ? "Running…" : "Run"}
+          </button>
         </div>
       </header>
 
