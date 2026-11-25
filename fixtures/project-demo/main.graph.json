@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "0.1",
+  "id": "example.hello",
+  "kind": "structured-flow",
+  "name": "Hello Visulith",
+  "nodes": [
+    {
+      "id": "start-1",
+      "definitionId": "visulith.core.start",
+      "definitionVersion": "0.1",
+      "position": { "x": 100, "y": 100 },
+      "properties": {}
+    },
+    {
+      "id": "log-1",
+      "definitionId": "visulith.core.console-log",
+      "definitionVersion": "0.1",
+      "position": { "x": 100, "y": 260 },
+      "properties": { "message": "Hello, Visulith!" }
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge-1",
+      "source": { "nodeId": "start-1", "portId": "exec-out" },
+      "target": { "nodeId": "log-1", "portId": "exec-in" },
+      "kind": "execution"
+    }
+  ]
+}

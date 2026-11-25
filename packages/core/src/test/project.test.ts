@@ -3,6 +3,8 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+import { parseGraphDocument } from "@visulith/engine";
 import {
   createProjectManifest,
   FileProjectStore,
@@ -40,4 +42,16 @@ test("invalid manifests are rejected with structured diagnostics", () => {
   const result = validateProjectManifest({ ...manifest, schemaVersion: "9.9" });
   assert.equal(result.ok, false);
   assert.ok(result.diagnostics.some((entry) => entry.code === "PROJECT_SCHEMA_UNSUPPORTED"));
+});
+
+test("the committed demo fixture contains a valid manifest and graph", () => {
+  const directory = fileURLToPath(new URL("../../../../fixtures/project-demo/", import.meta.url));
+  const manifest = JSON.parse(readFileSync(join(directory, "visulith.project.json"), "utf8")) as unknown;
+  const graph = JSON.parse(readFileSync(join(directory, "main.graph.json"), "utf8")) as unknown;
+  const manifestResult = validateProjectManifest(manifest);
+  assert.equal(manifestResult.ok, true);
+  assert.equal(manifestResult.value?.id, "example.hello");
+  const graphResult = parseGraphDocument(graph);
+  assert.equal(graphResult.ok, true);
+  assert.equal(graphResult.value?.id, manifestResult.value?.id);
 });

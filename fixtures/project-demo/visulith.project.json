@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "0.1",
+  "id": "example.hello",
+  "name": "Hello Visulith",
+  "version": "0.1.0",
+  "description": "Sample graph-authored project used by tests and the UI.",
+  "language": "typescript",
+  "template": "typescript-console",
+  "modules": [
+    {
+      "id": "main",
+      "kind": "graph",
+      "path": "main.graph.json",
+      "sourceOfTruth": "graph",
+      "build": "generate"
+    }
+  ],
+  "dependencies": {},
+  "buildProfile": {
+    "target": "node",
+    "outDir": "out"
+  },
+  "plugins": []
+}
