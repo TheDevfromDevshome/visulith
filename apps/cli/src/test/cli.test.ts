@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { runCli } from "../cli.js";
 
 const examplePath = fileURLToPath(new URL("../../../../fixtures/graph-example.json", import.meta.url));
+const branchingPath = fileURLToPath(new URL("../../../../fixtures/graph-branching.json", import.meta.url));
 
 test("CLI check accepts the example graph", async () => {
   assert.equal((await runCli(["check", examplePath])).exitCode, 0);
@@ -29,6 +30,20 @@ test("CLI run executes the generated program", async () => {
   const directory = mkdtempSync(join(tmpdir(), "visulith-cli-run-"));
   try {
     assert.equal((await runCli(["run", examplePath, "--out", directory])).exitCode, 0);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("CLI generates and runs the branching graph", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "visulith-cli-branching-"));
+  try {
+    const out = join(directory, "branching.ts");
+    assert.equal((await runCli(["generate", branchingPath, "--out", out])).exitCode, 0);
+    const source = readFileSync(out, "utf8");
+    assert.match(source, /const status: string = "yes";/);
+    assert.match(source, /if \(status === "yes"\)/);
+    assert.equal((await runCli(["run", branchingPath, "--out", directory])).exitCode, 0);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
