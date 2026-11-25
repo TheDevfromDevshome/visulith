@@ -7,7 +7,7 @@
     "beforeDevCommand": "pnpm --filter @visulith/web dev",
     "devUrl": "http://localhost:5173",
     "beforeBuildCommand": "pnpm --filter @visulith/web build",
-    "frontendDist": "../web/dist"
+    "frontendDist": "../../web/dist"
   },
   "app": {
     "windows": [
