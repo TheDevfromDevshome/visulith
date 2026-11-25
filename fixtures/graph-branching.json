@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "0.1",
+  "id": "example.branching",
+  "kind": "structured-flow",
+  "name": "Branching example",
+  "nodes": [
+    {
+      "id": "start-1",
+      "definitionId": "visulith.core.start",
+      "definitionVersion": "0.1",
+      "position": { "x": 80, "y": 160 },
+      "properties": {}
+    },
+    {
+      "id": "set-1",
+      "definitionId": "visulith.core.set-variable",
+      "definitionVersion": "0.1",
+      "position": { "x": 280, "y": 160 },
+      "properties": { "name": "status", "value": "yes" }
+    },
+    {
+      "id": "if-1",
+      "definitionId": "visulith.core.if",
+      "definitionVersion": "0.1",
+      "position": { "x": 480, "y": 160 },
+      "properties": { "variable": "status", "operator": "equals", "value": "yes" }
+    },
+    {
+      "id": "log-true",
+      "definitionId": "visulith.core.console-log",
+      "definitionVersion": "0.1",
+      "position": { "x": 700, "y": 80 },
+      "properties": { "message": "true branch" }
+    },
+    {
+      "id": "log-false",
+      "definitionId": "visulith.core.console-log",
+      "definitionVersion": "0.1",
+      "position": { "x": 700, "y": 260 },
+      "properties": { "message": "false branch" }
+    }
+  ],
+  "connections": [
+    {
+      "id": "edge-start-set",
+      "source": { "nodeId": "start-1", "portId": "exec-out" },
+      "target": { "nodeId": "set-1", "portId": "exec-in" },
+      "kind": "execution"
+    },
+    {
+      "id": "edge-set-if",
+      "source": { "nodeId": "set-1", "portId": "exec-out" },
+      "target": { "nodeId": "if-1", "portId": "exec-in" },
+      "kind": "execution"
+    },
+    {
+      "id": "edge-if-true",
+      "source": { "nodeId": "if-1", "portId": "exec-true" },
+      "target": { "nodeId": "log-true", "portId": "exec-in" },
+      "kind": "execution"
+    },
+    {
+      "id": "edge-if-false",
+      "source": { "nodeId": "if-1", "portId": "exec-false" },
+      "target": { "nodeId": "log-false", "portId": "exec-in" },
+      "kind": "execution"
+    }
+  ]
+}

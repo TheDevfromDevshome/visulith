@@ -5,9 +5,10 @@ Capabilities are declared per plugin and per backend. A true flag never means "c
 | Area | Implemented | Status |
 |---|---|---|
 | Graph documents | Parse, validate, persist (schema 0.1) | Available for MVP subset |
-| Graph kinds | `structured-flow`, one linear chain | Partial |
+| Graph kinds | `structured-flow`, linear chains and non-reconverging `if`/`else` branches | Partial |
+| Graph variables | String variables via `visulith.core.set-variable`, equality/inequality conditions | Experimental |
 | Graph editing | Add/connect/delete/move nodes in UI | Available (MVP subset) |
-| IR | Version 0.1, literals, calls, unit return, provenance | Partial |
+| IR | Version 0.1, literals, variables, binary equality, calls, conditionals, unit return, provenance | Partial |
 | TypeScript backend | Deterministic generation, source maps | Available for supported IR |
 | Build/run | tsc API + Node runtime, structured diagnostics | Available for TypeScript |
 | JavaScript/Python/C/C++/Rust/Java/C#/Assembly | Declarative plugin metadata only, no graph lowering | Not claimed |

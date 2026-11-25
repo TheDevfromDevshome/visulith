@@ -13,7 +13,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "tsx --test src/test/graph.test.ts src/test/ir.test.ts src/test/codegen.test.ts src/test/pipeline.test.ts"
+    "test": "tsx --test src/test/graph.test.ts src/test/nodes.test.ts src/test/flow.test.ts src/test/ir.test.ts src/test/lower-branching.test.ts src/test/codegen.test.ts src/test/codegen-branching.test.ts src/test/pipeline.test.ts src/test/branching-pipeline.test.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:dev",

@@ -1,36 +1,53 @@
 import { error, type Diagnostic } from "../diagnostics.js";
-import { CORE_START, type NodeDefinitionRegistry } from "./nodes.js";
-import { CORE_NODE_DEFINITIONS } from "./nodes.js";
+import { CORE_NODE_DEFINITIONS, CORE_START, type NodeDefinitionRegistry } from "./nodes.js";
 import type { GraphConnection, GraphDocument, GraphNode } from "./types.js";
 
+export interface FlowAnalysis {
+  start: GraphNode;
+  nodeById: Map<string, GraphNode>;
+  /** Execution connections keyed by `${nodeId}:${portId}`. */
+  execByPort: Map<string, GraphConnection>;
+  /** Depth-first preorder of every reachable node. */
+  order: GraphNode[];
+}
+
+export function executionKey(nodeId: string, portId: string): string {
+  return `${nodeId}:${portId}`;
+}
+
 /**
- * MVP semantics: structured flow is a single linear execution chain beginning at
- * exactly one Start node. Branching and event graphs need a future flow model.
+ * MVP semantics: structured flow is a rooted graph beginning at exactly one
+ * Start node. Linear nodes have one execution output; If nodes have two
+ * branches that may not reconverge. Dataflow and event graphs are future work.
  */
-export function buildExecutionChain(
+export function analyzeFlow(
   graph: GraphDocument,
   diagnostics: Diagnostic[],
   registry: NodeDefinitionRegistry = CORE_NODE_DEFINITIONS,
-): GraphNode[] {
+): FlowAnalysis | undefined {
   const nodeById = new Map(graph.nodes.map((node) => [node.id, node]));
-  const outgoing = new Map<string, GraphConnection>();
+  const execByPort = new Map<string, GraphConnection>();
+  const connectionsBySourceNode = new Map<string, GraphConnection[]>();
   const incomingCount = new Map<string, number>();
 
   for (const connection of graph.connections) {
     if (connection.kind !== "execution") continue;
-    const origin = {
-      graphId: graph.id,
-      nodeId: connection.source.nodeId,
-      connectionId: connection.id,
-    };
     if (!nodeById.has(connection.source.nodeId) || !nodeById.has(connection.target.nodeId)) continue;
-    if (outgoing.has(connection.source.nodeId)) {
+    const key = executionKey(connection.source.nodeId, connection.source.portId);
+    if (execByPort.has(key)) {
       diagnostics.push(
-        error("GRAPH_MULTIPLE_EXEC_OUTPUTS", "An execution output may only have one connection in the MVP subset.", origin),
+        error(
+          "GRAPH_MULTIPLE_EXEC_OUTPUTS",
+          "An execution output port may only have one connection in the MVP subset.",
+          { graphId: graph.id, nodeId: connection.source.nodeId, portId: connection.source.portId, connectionId: connection.id },
+        ),
       );
       continue;
     }
-    outgoing.set(connection.source.nodeId, connection);
+    execByPort.set(key, connection);
+    const outgoing = connectionsBySourceNode.get(connection.source.nodeId) ?? [];
+    outgoing.push(connection);
+    connectionsBySourceNode.set(connection.source.nodeId, outgoing);
     const count = (incomingCount.get(connection.target.nodeId) ?? 0) + 1;
     incomingCount.set(connection.target.nodeId, count);
     if (count > 1) {
@@ -51,49 +68,40 @@ export function buildExecutionChain(
         graphId: graph.id,
       }),
     );
-    return [];
+    return undefined;
   }
   if (starts.length > 1) {
     diagnostics.push(
-      error("GRAPH_START_MULTIPLE", "A structured-flow graph may contain only one Start node.", {
-        graphId: graph.id,
-      }),
+      error("GRAPH_START_MULTIPLE", "A structured-flow graph may contain only one Start node.", { graphId: graph.id }),
     );
-    return [];
+    return undefined;
   }
-
   const start = starts[0]!;
-  const order: GraphNode[] = [];
+
   const visited = new Set<string>();
   const visiting = new Set<string>();
-  let current: GraphNode | undefined = start;
-
-  while (current !== undefined) {
-    if (visiting.has(current.id)) {
+  const order: GraphNode[] = [];
+  const visit = (node: GraphNode): void => {
+    if (visiting.has(node.id)) {
       diagnostics.push(
-        error("GRAPH_EXECUTION_CYCLE", "The execution chain contains a cycle.", {
+        error("GRAPH_EXECUTION_CYCLE", "The execution graph contains a cycle.", {
           graphId: graph.id,
-          nodeId: current.id,
+          nodeId: node.id,
         }),
       );
-      break;
+      return;
     }
-    if (visited.has(current.id)) {
-      diagnostics.push(
-        error("GRAPH_EXECUTION_REVISITED", "A node is reached more than once by the execution chain.", {
-          graphId: graph.id,
-          nodeId: current.id,
-        }),
-      );
-      break;
+    if (visited.has(node.id)) return;
+    visiting.add(node.id);
+    order.push(node);
+    visited.add(node.id);
+    for (const connection of connectionsBySourceNode.get(node.id) ?? []) {
+      const target = nodeById.get(connection.target.nodeId);
+      if (target !== undefined) visit(target);
     }
-    visiting.add(current.id);
-    order.push(current);
-    visited.add(current.id);
-
-    const nextConnection = outgoing.get(current.id);
-    current = nextConnection ? nodeById.get(nextConnection.target.nodeId) : undefined;
-  }
+    visiting.delete(node.id);
+  };
+  visit(start);
 
   for (const node of graph.nodes) {
     if (!visited.has(node.id)) {
@@ -116,5 +124,14 @@ export function buildExecutionChain(
     }
   }
 
-  return order;
+  return { start, nodeById, execByPort, order };
+}
+
+/** Compatibility helper for callers that only need the ordered node list. */
+export function buildExecutionChain(
+  graph: GraphDocument,
+  diagnostics: Diagnostic[],
+  registry: NodeDefinitionRegistry = CORE_NODE_DEFINITIONS,
+): GraphNode[] {
+  return analyzeFlow(graph, diagnostics, registry)?.order ?? [];
 }

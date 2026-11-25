@@ -33,12 +33,31 @@ export interface IrFunction {
   origin: SourceOrigin;
 }
 
-export type IrStatement = IrCallStatement | IrReturnStatement;
+export type IrStatement =
+  | IrCallStatement
+  | IrVariableDeclaration
+  | IrConditional
+  | IrReturnStatement;
 
 export interface IrCallStatement {
   kind: "call";
   target: string;
   arguments: IrExpression[];
+  origin: SourceOrigin;
+}
+
+export interface IrVariableDeclaration {
+  kind: "variable";
+  name: string;
+  value: IrExpression;
+  origin: SourceOrigin;
+}
+
+export interface IrConditional {
+  kind: "conditional";
+  condition: IrExpression;
+  thenBody: IrStatement[];
+  elseBody: IrStatement[];
   origin: SourceOrigin;
 }
 
@@ -52,7 +71,9 @@ export type IrExpression =
   | IrStringLiteral
   | IrIntegerLiteral
   | IrFloatLiteral
-  | IrBooleanLiteral;
+  | IrBooleanLiteral
+  | IrVariableReference
+  | IrBinaryExpression;
 
 export interface IrStringLiteral {
   kind: "string";
@@ -72,6 +93,20 @@ export interface IrFloatLiteral {
 export interface IrBooleanLiteral {
   kind: "boolean";
   value: boolean;
+}
+
+export interface IrVariableReference {
+  kind: "variable";
+  name: string;
+}
+
+export type IrBinaryOperator = "===" | "!==";
+
+export interface IrBinaryExpression {
+  kind: "binary";
+  operator: IrBinaryOperator;
+  left: IrExpression;
+  right: IrExpression;
 }
 
 export function unitType(): TypeRef {

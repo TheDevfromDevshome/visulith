@@ -94,7 +94,7 @@ export function validateGraph(
         }
         continue;
       }
-      if (!isPropertyValueOfType(node.properties[property.key], property.type)) {
+      if (!isPropertyValueOfType(node.properties[property.key], property.type, property.enumValues)) {
         diagnostics.push(
           error(
             "GRAPH_PROPERTY_TYPE_MISMATCH",

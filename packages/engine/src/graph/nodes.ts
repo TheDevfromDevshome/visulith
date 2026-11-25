@@ -13,6 +13,7 @@ export interface PropertyDefinition {
   key: string;
   type: TypeRef;
   required: boolean;
+  enumValues?: readonly string[];
 }
 
 export interface NodeDefinition {
@@ -77,12 +78,59 @@ export const CORE_CONSOLE_LOG: NodeDefinition = {
   capabilities: ["structured-flow", "ir-export"],
 };
 
+export const CORE_SET_VARIABLE: NodeDefinition = {
+  definitionId: "visulith.core.set-variable",
+  version: "0.1",
+  displayName: "Set Variable",
+  category: "data",
+  inputs: [execIn],
+  outputs: [execOut],
+  properties: [
+    { key: "name", type: TYPES.string, required: true },
+    { key: "value", type: TYPES.string, required: true },
+  ],
+  capabilities: ["structured-flow", "ir-export"],
+};
+
+export const CORE_IF: NodeDefinition = {
+  definitionId: "visulith.core.if",
+  version: "0.1",
+  displayName: "If",
+  category: "flow",
+  inputs: [execIn],
+  outputs: [
+    {
+      id: "exec-true",
+      direction: "output",
+      kind: "execution",
+      type: TYPES.unit,
+      description: "Branch taken when the condition is true.",
+    },
+    {
+      id: "exec-false",
+      direction: "output",
+      kind: "execution",
+      type: TYPES.unit,
+      description: "Branch taken when the condition is false.",
+    },
+  ],
+  properties: [
+    { key: "variable", type: TYPES.string, required: true },
+    { key: "operator", type: TYPES.string, required: true, enumValues: ["equals", "notEquals"] },
+    { key: "value", type: TYPES.string, required: true },
+  ],
+  capabilities: ["structured-flow", "ir-export", "branching"],
+};
+
 export const CORE_NODE_DEFINITIONS: NodeDefinitionRegistry = new Map<string, NodeDefinition>([
   [CORE_START.definitionId, CORE_START],
   [CORE_CONSOLE_LOG.definitionId, CORE_CONSOLE_LOG],
+  [CORE_SET_VARIABLE.definitionId, CORE_SET_VARIABLE],
+  [CORE_IF.definitionId, CORE_IF],
 ]);
 
-export function isPropertyValueOfType(value: unknown, type: TypeRef): boolean {
+export function isPropertyValueOfType(value: unknown, type: TypeRef, enumValues?: readonly string[]): boolean {
+  if (enumValues !== undefined && (typeof value !== "string" || !enumValues.includes(value))) return false;
   switch (type.name) {
     case "core.string":
       return typeof value === "string";
