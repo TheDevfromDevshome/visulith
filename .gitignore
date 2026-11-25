@@ -1,6 +1,7 @@
 node_modules/
 dist/
 out/
+target/
 *.log
 
 # Local specification/planning material is intentionally not part of the repository.

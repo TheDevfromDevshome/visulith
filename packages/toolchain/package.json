@@ -1,0 +1,27 @@
+{
+  "name": "@visulith/toolchain",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsx --test src/test/build.test.ts"
+  },
+  "dependencies": {
+    "@visulith/core": "workspace:*",
+    "@visulith/engine": "workspace:*",
+    "typescript": "catalog:dev"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "tsx": "catalog:dev"
+  }
+}

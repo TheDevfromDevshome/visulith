@@ -9,6 +9,14 @@
     "check": "node apps/cli/dist/main.js check fixtures/graph-example.json",
     "generate": "node apps/cli/dist/main.js generate fixtures/graph-example.json --out out/hello.ts",
     "run:example": "node apps/cli/dist/main.js run fixtures/graph-example.json --out out",
+    "project:demo": "node apps/cli/dist/main.js project create demo --name Demo",
+    "tools": "node apps/cli/dist/main.js tools",
+    "dev:web": "pnpm --filter @visulith/web dev",
+    "build:web": "pnpm --filter @visulith/web build",
+    "desktop:dev": "cargo tauri dev --manifest-path apps/desktop/src-tauri/Cargo.toml",
+    "desktop:build": "pnpm --filter @visulith/web build && cargo tauri build --manifest-path apps/desktop/src-tauri/Cargo.toml",
+    "registry:dev": "node services/registry/dist/main.js",
+    "icons": "node scripts/create-placeholder-icons.mjs",
     "verify": "pnpm build && pnpm test && pnpm run:example"
   },
   "devDependencies": {

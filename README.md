@@ -26,10 +26,23 @@ graph.json → validation → IR 0.1 → deterministic TypeScript → tsc → no
 Layout:
 
 ```text
-packages/engine/   Graph model, validation, IR, TypeScript backend
-apps/cli/          check / generate / run commands
-out/               Generated output (derived, gitignored)
+packages/engine/            Graph model, validation, IR, TypeScript backend
+packages/core/              Project manifest, workspace, commands, settings
+packages/toolchain/         Tool detection, structured processes, build/run
+packages/plugin-api/        Versioned manifest and capability contracts
+packages/plugin-host/       Declarative plugin loading and activation
+packages/templates/         Built-in project templates
+packages/ai/                Provider-independent proposals with approval gates
+packages/registry/          Local package metadata and checksum verification
+packages/library-npm/       npm inspection and best-effort nodes
+packages/language-typescript/ Declarative language plugin
+apps/cli/                   check / generate / run / build / project / tools
+apps/web/                   React workspace UI
+apps/desktop/               Tauri 2 shell with scoped IPC
+out/                        Generated output (derived, gitignored)
 ```
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/CAPABILITIES.md](docs/CAPABILITIES.md).
 
 ## Requirements
 
@@ -43,6 +56,20 @@ pnpm install
 pnpm build
 pnpm test
 pnpm verify
+```
+
+Work on the UI or desktop shell:
+
+```powershell
+pnpm dev:web        # Vite dev server
+pnpm desktop:dev    # Tauri window (requires WebView2 on Windows)
+```
+
+CLI:
+
+```powershell
+pnpm tools          # detect node, npm and tsc
+pnpm project:demo   # create a sample project manifest
 ```
 
 `pnpm verify` builds, runs all tests and executes the example graph. Expected output:

@@ -12,7 +12,9 @@
     "test": "tsx --test src/test/cli.test.ts"
   },
   "dependencies": {
+    "@visulith/core": "workspace:*",
     "@visulith/engine": "workspace:*",
+    "@visulith/toolchain": "workspace:*",
     "typescript": "catalog:dev"
   },
   "devDependencies": {

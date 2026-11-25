@@ -6,19 +6,17 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { runCli } from "../cli.js";
 
-const examplePath = fileURLToPath(
-  new URL("../../../../fixtures/graph-example.json", import.meta.url),
-);
+const examplePath = fileURLToPath(new URL("../../../../fixtures/graph-example.json", import.meta.url));
 
-test("CLI check accepts the example graph", () => {
-  assert.equal(runCli(["check", examplePath]).exitCode, 0);
+test("CLI check accepts the example graph", async () => {
+  assert.equal((await runCli(["check", examplePath])).exitCode, 0);
 });
 
-test("CLI generates source and a source map", () => {
+test("CLI generates source and a source map", async () => {
   const directory = mkdtempSync(join(tmpdir(), "visulith-cli-"));
   try {
     const out = join(directory, "hello.ts");
-    assert.equal(runCli(["generate", examplePath, "--out", out]).exitCode, 0);
+    assert.equal((await runCli(["generate", examplePath, "--out", out])).exitCode, 0);
     assert.match(readFileSync(out, "utf8"), /Hello, Visulith!/);
     const map = JSON.parse(readFileSync(`${out}.map.json`, "utf8")) as { mappings: unknown[] };
     assert.ok(map.mappings.length > 0);
@@ -27,10 +25,29 @@ test("CLI generates source and a source map", () => {
   }
 });
 
-test("CLI run executes the generated program", () => {
+test("CLI run executes the generated program", async () => {
   const directory = mkdtempSync(join(tmpdir(), "visulith-cli-run-"));
   try {
-    assert.equal(runCli(["run", examplePath, "--out", directory]).exitCode, 0);
+    assert.equal((await runCli(["run", examplePath, "--out", directory])).exitCode, 0);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("CLI project create and list work in an isolated root", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "visulith-cli-project-"));
+  try {
+    assert.equal((await runCli(["project", "create", "demo", "--root", directory, "--name", "Demo"])).exitCode, 0);
+    assert.equal((await runCli(["project", "list", "--root", directory])).exitCode, 0);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("CLI build compiles and runs the example graph", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "visulith-cli-build-"));
+  try {
+    assert.equal((await runCli(["build", examplePath, "--root", directory, "--run", "true"])).exitCode, 0);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
