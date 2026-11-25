@@ -1,0 +1,30 @@
+{
+  "name": "@visulith/web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "tsx --test src/lib/graph.test.ts src/lib/node-definitions.test.ts src/lib/bridge.test.ts"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@visulith/engine": "workspace:*",
+    "@xyflow/react": "^12.8.6",
+    "lucide-react": "^0.468.0",
+    "monaco-editor": "^0.52.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "tsx": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vite": "^6.3.5"
+  }
+}
