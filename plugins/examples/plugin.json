@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1",
+  "id": "@visulith/examples-node-pack",
+  "name": "Visulith Example Node Pack",
+  "version": "0.1.0",
+  "hostApi": "^0.1",
+  "categories": ["nodes", "examples"],
+  "capabilities": ["visualNodes"],
+  "license": "Apache-2.0",
+  "description": "Sample declarative node pack. It contains data only; there is no plugin code to execute.",
+  "publisher": "Visulith",
+  "permissions": [],
+  "contributions": {
+    "nodes": [
+      {
+        "definitionId": "examples.number-format",
+        "version": "0.1.0",
+        "displayName": "Format Number",
+        "category": "examples",
+        "description": "Example node metadata only; no IR lowering or runtime implementation is declared.",
+        "inputs": [
+          {
+            "id": "exec-in",
+            "direction": "input",
+            "kind": "execution",
+            "type": { "kind": "primitive", "name": "core.unit" },
+            "required": true
+          },
+          {
+            "id": "value",
+            "direction": "input",
+            "kind": "data",
+            "type": { "kind": "primitive", "name": "core.f64" },
+            "required": true,
+            "description": "Number to format."
+          }
+        ],
+        "outputs": [
+          {
+            "id": "exec-out",
+            "direction": "output",
+            "kind": "execution",
+            "type": { "kind": "primitive", "name": "core.unit" }
+          },
+          {
+            "id": "formatted",
+            "direction": "output",
+            "kind": "data",
+            "type": { "kind": "primitive", "name": "core.string" }
+          }
+        ],
+        "properties": [
+          { "key": "fractionDigits", "type": { "kind": "primitive", "name": "core.i32" }, "required": false }
+        ],
+        "capabilities": ["visualNodes"]
+      },
+      {
+        "definitionId": "examples.string-upper",
+        "version": "0.1.0",
+        "displayName": "Uppercase String",
+        "category": "examples",
+        "inputs": [
+          {
+            "id": "exec-in",
+            "direction": "input",
+            "kind": "execution",
+            "type": { "kind": "primitive", "name": "core.unit" },
+            "required": true
+          },
+          {
+            "id": "text",
+            "direction": "input",
+            "kind": "data",
+            "type": { "kind": "primitive", "name": "core.string" },
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "exec-out",
+            "direction": "output",
+            "kind": "execution",
+            "type": { "kind": "primitive", "name": "core.unit" }
+          }
+        ],
+        "properties": [],
+        "capabilities": ["visualNodes"]
+      }
+    ]
+  }
+}

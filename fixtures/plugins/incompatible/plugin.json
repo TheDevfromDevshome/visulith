@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1",
+  "id": "example.future-plugin",
+  "name": "Future Host Plugin",
+  "version": "1.0.0",
+  "hostApi": "^0.2",
+  "categories": ["nodes"],
+  "capabilities": ["visualNodes"],
+  "license": "MIT",
+  "description": "Valid manifest that requires a newer host API than 0.1."
+}

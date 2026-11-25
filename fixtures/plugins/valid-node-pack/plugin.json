@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1",
+  "id": "example.node-pack",
+  "name": "Example Declarative Node Pack",
+  "version": "0.1.0",
+  "hostApi": "^0.1",
+  "categories": ["nodes", "examples"],
+  "capabilities": ["visualNodes", "irExport"],
+  "license": "MIT",
+  "description": "A fixture node pack whose entire contribution is JSON data.",
+  "permissions": [
+    {
+      "kind": "workspace",
+      "reason": "Read graph documents so node parameters can be displayed.",
+      "scope": "graphs/**"
+    }
+  ],
+  "contributions": {
+    "nodes": [
+      {
+        "definitionId": "example.node-pack.notify",
+        "version": "0.1.0",
+        "displayName": "Notify",
+        "category": "io",
+        "description": "Best-effort example node; no IR lowering is provided by this manifest.",
+        "inputs": [
+          {
+            "id": "exec-in",
+            "direction": "input",
+            "kind": "execution",
+            "type": { "kind": "primitive", "name": "core.unit" },
+            "required": true
+          },
+          {
+            "id": "message",
+            "direction": "input",
+            "kind": "data",
+            "type": { "kind": "primitive", "name": "core.string" },
+            "required": false
+          }
+        ],
+        "outputs": [
+          {
+            "id": "exec-out",
+            "direction": "output",
+            "kind": "execution",
+            "type": { "kind": "primitive", "name": "core.unit" }
+          }
+        ],
+        "properties": [{ "key": "message", "type": { "kind": "primitive", "name": "core.string" }, "required": true }],
+        "capabilities": ["visualNodes"]
+      }
+    ]
+  },
+  "compatibility": {
+    "node": ">=18"
+  }
+}

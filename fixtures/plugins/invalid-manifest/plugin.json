@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "2",
+  "id": "Bad Plugin ID",
+  "name": "Invalid Fixture",
+  "version": "one",
+  "hostApi": "not-a-range",
+  "categories": [],
+  "capabilities": ["teleportation"]
+}

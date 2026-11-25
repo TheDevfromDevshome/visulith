@@ -98,6 +98,18 @@ importers:
         specifier: ^6.3.5
         version: 6.4.6(@types/node@24.19.4)(tsx@4.23.15)
 
+  packages/ai:
+    devDependencies:
+      '@types/node':
+        specifier: catalog:dev
+        version: 24.19.4
+      tsx:
+        specifier: catalog:dev
+        version: 4.23.15
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
+
   packages/core:
     dependencies:
       '@visulith/engine':
@@ -115,6 +127,34 @@ importers:
         version: 5.9.3
 
   packages/engine:
+    devDependencies:
+      '@types/node':
+        specifier: catalog:dev
+        version: 24.19.4
+      tsx:
+        specifier: catalog:dev
+        version: 4.23.15
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
+
+  packages/language-typescript:
+    devDependencies:
+      '@types/node':
+        specifier: catalog:dev
+        version: 24.19.4
+      tsx:
+        specifier: catalog:dev
+        version: 4.23.15
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
+
+  packages/library-npm:
+    dependencies:
+      '@visulith/plugin-api':
+        specifier: workspace:*
+        version: link:../plugin-api
     devDependencies:
       '@types/node':
         specifier: catalog:dev
@@ -154,6 +194,30 @@ importers:
         specifier: catalog:dev
         version: 5.9.3
 
+  packages/registry:
+    devDependencies:
+      '@types/node':
+        specifier: catalog:dev
+        version: 24.19.4
+      tsx:
+        specifier: catalog:dev
+        version: 4.23.15
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
+
+  packages/templates:
+    devDependencies:
+      '@types/node':
+        specifier: catalog:dev
+        version: 24.19.4
+      tsx:
+        specifier: catalog:dev
+        version: 4.23.15
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
+
   packages/toolchain:
     dependencies:
       '@visulith/core':
@@ -172,6 +236,18 @@ importers:
       tsx:
         specifier: catalog:dev
         version: 4.23.15
+
+  services/registry:
+    devDependencies:
+      '@types/node':
+        specifier: catalog:dev
+        version: 24.19.4
+      tsx:
+        specifier: catalog:dev
+        version: 4.23.15
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
 
 packages:
 
