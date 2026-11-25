@@ -1,0 +1,22 @@
+{
+  "name": "@visulith/cli",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/cli.js",
+  "bin": {
+    "visulith": "./dist/main.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsx --test src/test/cli.test.ts"
+  },
+  "dependencies": {
+    "@visulith/engine": "workspace:*",
+    "typescript": "catalog:dev"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "tsx": "catalog:dev"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "visulith-workspace",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.33.3",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "check": "node apps/cli/dist/main.js check fixtures/graph-example.json",
+    "generate": "node apps/cli/dist/main.js generate fixtures/graph-example.json --out out/hello.ts",
+    "run:example": "node apps/cli/dist/main.js run fixtures/graph-example.json --out out",
+    "verify": "pnpm build && pnpm test && pnpm run:example"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "tsx": "catalog:dev",
+    "typescript": "catalog:dev"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}

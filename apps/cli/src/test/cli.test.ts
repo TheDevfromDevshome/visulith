@@ -1,0 +1,37 @@
+import assert from "node:assert/strict";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+import { runCli } from "../cli.js";
+
+const examplePath = fileURLToPath(
+  new URL("../../../../fixtures/graph-example.json", import.meta.url),
+);
+
+test("CLI check accepts the example graph", () => {
+  assert.equal(runCli(["check", examplePath]).exitCode, 0);
+});
+
+test("CLI generates source and a source map", () => {
+  const directory = mkdtempSync(join(tmpdir(), "visulith-cli-"));
+  try {
+    const out = join(directory, "hello.ts");
+    assert.equal(runCli(["generate", examplePath, "--out", out]).exitCode, 0);
+    assert.match(readFileSync(out, "utf8"), /Hello, Visulith!/);
+    const map = JSON.parse(readFileSync(`${out}.map.json`, "utf8")) as { mappings: unknown[] };
+    assert.ok(map.mappings.length > 0);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("CLI run executes the generated program", () => {
+  const directory = mkdtempSync(join(tmpdir(), "visulith-cli-run-"));
+  try {
+    assert.equal(runCli(["run", examplePath, "--out", directory]).exitCode, 0);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
