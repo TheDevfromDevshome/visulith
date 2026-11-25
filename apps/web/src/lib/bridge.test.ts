@@ -71,3 +71,10 @@ test("browser preview interprets a repeat loop", async () => {
   assert.equal(result.exitCode, 0);
   assert.deepEqual(result.output.trim().split(/\r?\n/), ["tick", "tick", "tick", "done"]);
 });
+
+test("browser preview evaluates a dataflow graph with arithmetic", async () => {
+  const result = await new WebBridge().runProgram({ graph: loadFixture("graph-dataflow.json") });
+  assert.equal(result.mode, "browser-preview");
+  assert.equal(result.exitCode, 0);
+  assert.equal(result.output.trim(), "5");
+});

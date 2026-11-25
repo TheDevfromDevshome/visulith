@@ -135,8 +135,10 @@ function generated(diagnostics: Diagnostic[]): GeneratedCode {
   };
 }
 
+type PreviewValue = string | number | boolean;
+
 interface PreviewState {
-  variables: Map<string, string>;
+  variables: Map<string, PreviewValue>;
   lines: string[];
   steps: number;
   limitReached: boolean;
@@ -144,7 +146,7 @@ interface PreviewState {
 
 const PREVIEW_STEP_LIMIT = 10_000;
 
-function previewValue(expression: IrExpression, variables: ReadonlyMap<string, string>): string | number | boolean | undefined {
+function previewValue(expression: IrExpression, variables: ReadonlyMap<string, PreviewValue>): PreviewValue | undefined {
   switch (expression.kind) {
     case "string":
       return expression.value;
@@ -159,6 +161,9 @@ function previewValue(expression: IrExpression, variables: ReadonlyMap<string, s
       const left = previewValue(expression.left, variables);
       const right = previewValue(expression.right, variables);
       if (left === undefined || right === undefined) return undefined;
+      if (expression.operator === "+") {
+        return typeof left === "number" && typeof right === "number" ? left + right : undefined;
+      }
       return expression.operator === "===" ? left === right : left !== right;
     }
     default:
@@ -183,7 +188,7 @@ function previewStatements(statements: readonly IrStatement[], state: PreviewSta
     }
     if (statement.kind === "variable") {
       const value = previewValue(statement.value, state.variables);
-      if (value !== undefined) state.variables.set(statement.name, String(value));
+      if (value !== undefined) state.variables.set(statement.name, value);
       continue;
     }
     if (statement.kind === "conditional") {
