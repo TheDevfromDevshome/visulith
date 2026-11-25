@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "0.1",
+  "overrides": [
+    {
+      "definitionId": "npm.example-math-tools.greet",
+      "displayName": "Greeting",
+      "description": "Manually reviewed adapter override."
+    }
+  ]
+}
