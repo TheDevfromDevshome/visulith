@@ -10,6 +10,7 @@ const examplePath = fileURLToPath(new URL("../../../../fixtures/graph-example.js
 const branchingPath = fileURLToPath(new URL("../../../../fixtures/graph-branching.json", import.meta.url));
 const joinPath = fileURLToPath(new URL("../../../../fixtures/graph-join.json", import.meta.url));
 const loopPath = fileURLToPath(new URL("../../../../fixtures/graph-loop.json", import.meta.url));
+const dataflowPath = fileURLToPath(new URL("../../../../fixtures/graph-dataflow.json", import.meta.url));
 
 test("CLI check accepts the example graph", async () => {
   assert.equal((await runCli(["check", examplePath])).exitCode, 0);
@@ -72,6 +73,19 @@ test("CLI generates and runs the repeat graph", async () => {
     assert.equal((await runCli(["generate", loopPath, "--out", out])).exitCode, 0);
     assert.match(readFileSync(out, "utf8"), /__visulith_loop_0 < 3/);
     assert.equal((await runCli(["run", loopPath, "--out", directory])).exitCode, 0);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("CLI generates and runs the dataflow graph", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "visulith-cli-dataflow-"));
+  try {
+    assert.equal((await runCli(["check", dataflowPath])).exitCode, 0);
+    const out = join(directory, "dataflow.ts");
+    assert.equal((await runCli(["generate", dataflowPath, "--out", out])).exitCode, 0);
+    assert.match(readFileSync(out, "utf8"), /const __visulith_df_0_sum: number = 2 \+ 3;/);
+    assert.equal((await runCli(["run", dataflowPath, "--out", directory])).exitCode, 0);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
